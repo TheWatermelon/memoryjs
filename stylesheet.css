@@ -1,8 +1,27 @@
 * {
-	background-color: grey;
+	background-color: white;
 }
 
 body {
 	margin: 0;
 	padding: 0;
+}
+
+canvas {
+	display: block;
+	background-color: white;
+	margin-left: calc((100% - 6*64px)/2);
+}
+
+a {
+	text-decoration: none;
+	color: black;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	text-align: center;
 }

@@ -1,7 +1,5 @@
 // init canvas
 var c=document.getElementById('myCanvas');
-c.width=10*64;
-c.height=20*64;
 var ctx=c.getContext('2d');
 
 // load sprites
@@ -11,10 +9,15 @@ spr.onload=function() { sprReady=true; };
 spr.src='sprites64.png';
 
 // init cards
+var cards;
 var cardFaceDown={x:0, y:0};
-var cards=[];
 var focusedCard=-1;
 var hasCountdown=false;
+
+// misc
+var level=2;
+var changeLevel=function(lvl) { init(lvl); }
+var clicks=0;
 
 // Fisher-Yates Shuffle
 var shuffle=function(array) {
@@ -37,15 +40,56 @@ var shuffle=function(array) {
 	return array;
 }
 
-var init=function() {
+var init=function(lvl) {
+	level=lvl;
+	c.width=6*64;
+	c.height=level*3*64;
+
+	clicks=0;
+
 	focusedCard=-1;
 
-	for(var i=0; i<9; i++) {
+	cards=[];
+	for(var i=0; i<9*level; i++) {
 		cards.push({id:i, show:false});
 		cards.push({id:i, show:false});
 	}
 	shuffle(cards);
+
+	// set level chooser
+	if(document.getElementById('level')!==null) document.getElementById('level').remove();
+	var p=document.createElement("p");
+	p.setAttribute('id', 'level');
+	document.body.appendChild(p);
+	var txt=document.createTextNode("Level ");
+	p.appendChild(txt);
+	for(var i=1; i<9; i++) {
+		if(i==level) {
+			var lvl=document.createElement("span");
+			var txt=document.createTextNode(i);
+			lvl.appendChild(txt);
+			lvl.style.fontWeight="bold";
+		} else {
+			var lvl=document.createElement("a");
+			lvl.setAttribute("href", "#");
+			var txt=document.createTextNode(i);
+			lvl.appendChild(txt);
+			const l=i;
+			lvl.addEventListener('click', function() { changeLevel(l); });
+		}
+		p.appendChild(lvl);
+		p.appendChild(document.createTextNode(' '));
+	}
+
+	// clicks
+	if(document.getElementById('clicks')!==null) document.getElementById('clicks').remove();
+	var cl = document.createElement("p");
+	cl.setAttribute("id", "clicks");
+	document.body.appendChild(cl);
+	cl.appendChild(document.createTextNode("Clicks: "+clicks));
 }
+
+
 
 var reset=function() {}
 
@@ -61,17 +105,26 @@ var matchCards=function(index1, index2) {
 	focusedCard=-1;
 }
 
+var checkWin=function() {
+	cards.forEach(function(item, index, array) {
+		if(!item.show) return false;
+	});
+	return true;
+}
+
 // show card clicked
 var click=function(event) {
 	if(hasCountdown) return;
-	var index=Math.floor(event.clientX/64)+Math.floor(event.clientY/64)*6;
+	var offsetX=(document.body.clientWidth-6*64)/2;
+	var index=Math.floor((event.clientX-offsetX)/64)+Math.floor(event.clientY/64)*6;
 	if(index>=cards.length) return;
-	//console.log(cards[index]);
+	console.log(document.body.scrollTop);
 	if(!cards[index].show) {
 		cards[index].show=true;
 		if(focusedCard==-1) focusedCard=index;
 		else matchCards(focusedCard, index);
 	}
+	clicks++;
 }
 c.onclick=click;
 
@@ -85,17 +138,27 @@ var counter=function() {
 	});
 }
 
-var update=function(modifier) {}
+var update=function(modifier) {
+	checkWin();
+
+	var cl=document.getElementById("clicks");
+	cl.removeChild(cl.firstChild);
+	cl.appendChild(document.createTextNode("Clicks: "+clicks));
+}
 
 var render=function() {
 	if(sprReady) {
 		var offsetX=0;
 		var offsetY=0;
 		// 
-		for(var i=0; i<3; i++) {
+		for(var i=0; i<3*level; i++) {
 			for(var j=0; j<6; j++) {
 				var index=i*6+j;
-				if(cards[index].show || cards[index].countdown>0) ctx.drawImage(spr, 64, cards[index].id*64, 64, 64, offsetX, offsetY, 64, 64);
+				if(cards[index].show || cards[index].countdown>0) {
+					var cardY=cards[index].id%9;
+					var cardX=Math.floor(cards[index].id/9);
+					ctx.drawImage(spr, 64+64*cardX, 64*cardY, 64, 64, offsetX, offsetY, 64, 64);
+				}
 				else ctx.drawImage(spr, cardFaceDown.x, cardFaceDown.y, 64, 64, offsetX, offsetY, 64, 64);
 			
 				offsetX+=64;
@@ -122,6 +185,6 @@ var main = function () {
 var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
-init();
+init(level);
 reset();
 main();
