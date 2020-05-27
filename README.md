@@ -1,6 +1,7 @@
-## memoryjs
+# What is it?
+Memoryjs is a tribute to my first graphical game made originally in C. It is based on the html5 canvas and written in pure Javascript.
 
-## todo
+# TODO
 - **menus**
 	- [ ] main menu (click/any key to play + waldo image)
 	- [ ] in between levels (next level, quit to main menu)
@@ -14,3 +15,7 @@
 	- [X] draw cards on screen
 	- [X] clicks count
 	- [ ] timer
+	
+# Credits
+- thanks to [scale2x](https://www.scale2x.it/) for letting me update my old 32x32 sprites
+- sprites inspired by [Where's Waldo?](https://waldo.fandom.com/wiki/Where%27s_Waldo%3F)
