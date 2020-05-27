@@ -114,7 +114,7 @@ var checkWin=function() {
 
 // show card clicked
 var click=function(event) {
-	if(hasCountdown) return;
+	if(hasCountdown || checkWin()) return;
 	var offsetX=(document.body.clientWidth-6*64)/2;
 	var offsetY=window.scrollY;
 	var index=Math.floor((event.clientX-offsetX)/64)+Math.floor((event.clientY+offsetY)/64)*6;
@@ -124,8 +124,8 @@ var click=function(event) {
 		cards[index].show=true;
 		if(focusedCard==-1) focusedCard=index;
 		else matchCards(focusedCard, index);
+		clicks++;
 	}
-	if(!checkWin()) clicks++;
 }
 c.onclick=click;
 
@@ -140,7 +140,6 @@ var counter=function() {
 }
 
 var update=function(modifier) {
-	checkWin();
 
 	var cl=document.getElementById("clicks");
 	cl.removeChild(cl.firstChild);
