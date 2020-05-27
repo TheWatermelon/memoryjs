@@ -15,7 +15,7 @@ var focusedCard=-1;
 var hasCountdown=false;
 
 // misc
-var level=2;
+var level=1;
 var changeLevel=function(lvl) { init(lvl); }
 var clicks=0;
 
