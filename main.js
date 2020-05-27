@@ -16,7 +16,6 @@ var hasCountdown=false;
 
 // misc
 var level=1;
-var changeLevel=function(lvl) { init(lvl); }
 var clicks=0;
 
 // Fisher-Yates Shuffle
@@ -75,7 +74,7 @@ var init=function(lvl) {
 			var txt=document.createTextNode(i);
 			lvl.appendChild(txt);
 			const l=i;
-			lvl.addEventListener('click', function() { changeLevel(l); });
+			lvl.addEventListener('click', function() { init(l); });
 		}
 		p.appendChild(lvl);
 		p.appendChild(document.createTextNode(' '));
