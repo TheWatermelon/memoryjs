@@ -105,25 +105,27 @@ var matchCards=function(index1, index2) {
 }
 
 var checkWin=function() {
+	var won=true;
 	cards.forEach(function(item, index, array) {
-		if(!item.show) return false;
+		if(item.show!==true) { won=false; return won; }
 	});
-	return true;
+	return won;
 }
 
 // show card clicked
 var click=function(event) {
 	if(hasCountdown) return;
 	var offsetX=(document.body.clientWidth-6*64)/2;
-	var index=Math.floor((event.clientX-offsetX)/64)+Math.floor(event.clientY/64)*6;
+	var offsetY=window.scrollY;
+	var index=Math.floor((event.clientX-offsetX)/64)+Math.floor((event.clientY+offsetY)/64)*6;
 	if(index>=cards.length) return;
-	console.log(document.body.scrollTop);
+	//console.log(checkWin());
 	if(!cards[index].show) {
 		cards[index].show=true;
 		if(focusedCard==-1) focusedCard=index;
 		else matchCards(focusedCard, index);
 	}
-	clicks++;
+	if(!checkWin()) clicks++;
 }
 c.onclick=click;
 
