@@ -41,28 +41,33 @@ var shuffle=function(array) {
 
 var init=function(lvl) {
 	level=lvl;
+	clicks=0;
+
+	// fixed canvas size based on number of cards
 	c.width=6*64;
 	c.height=level*3*64;
 
-	clicks=0;
-
+	// setup cards
 	focusedCard=-1;
-
 	cards=[];
+	// one column of 9 cards added per level
 	for(var i=0; i<9*level; i++) {
+		// pair of cards
 		cards.push({id:i, show:false});
 		cards.push({id:i, show:false});
 	}
 	shuffle(cards);
 
-	// set level chooser
+	// level picker on page
 	if(document.getElementById('level')!==null) document.getElementById('level').remove();
 	var p=document.createElement("p");
 	p.setAttribute('id', 'level');
 	document.body.appendChild(p);
 	var txt=document.createTextNode("Level ");
 	p.appendChild(txt);
+	// for each level
 	for(var i=1; i<9; i++) {
+		// current level unclickable
 		if(i==level) {
 			var lvl=document.createElement("span");
 			var txt=document.createTextNode(i);
@@ -80,7 +85,7 @@ var init=function(lvl) {
 		p.appendChild(document.createTextNode(' '));
 	}
 
-	// clicks
+	// show clicks number on page
 	if(document.getElementById('clicks')!==null) document.getElementById('clicks').remove();
 	var cl = document.createElement("p");
 	cl.setAttribute("id", "clicks");
@@ -88,22 +93,21 @@ var init=function(lvl) {
 	cl.appendChild(document.createTextNode("Clicks: "+clicks));
 }
 
-
-
-var reset=function() {}
-
 // match cards based on id
 var matchCards=function(index1, index2) {
 	if(cards[index1].id !== cards[index2].id) {
+		// countdown let the cards visible for a bit before flipping them back down
 		cards[index1].countdown = 50;
 		cards[index1].show=false;
 		cards[index2].countdown = 50;
 		cards[index2].show=false;
 		hasCountdown=true;
 	}
+	// can click a new card
 	focusedCard=-1;
 }
 
+// win condition : all the cards are face-up
 var checkWin=function() {
 	var won=true;
 	cards.forEach(function(item, index, array) {
@@ -115,21 +119,26 @@ var checkWin=function() {
 // show card clicked
 var click=function(event) {
 	if(hasCountdown || checkWin()) return;
+	// offsetX if the left margin
 	var offsetX=(document.body.clientWidth-6*64)/2;
+	// offsetY is the current y scroll
 	var offsetY=window.scrollY;
 	var index=Math.floor((event.clientX-offsetX)/64)+Math.floor((event.clientY+offsetY)/64)*6;
-	if(index>=cards.length) return;
 	//console.log(checkWin());
 	if(!cards[index].show) {
 		cards[index].show=true;
+		// first card
 		if(focusedCard==-1) focusedCard=index;
+		// two cards
 		else matchCards(focusedCard, index);
 		clicks++;
+		updateClicks();
 	}
 }
+// make the canvas clickable
 c.onclick=click;
 
-// Counter called each interval
+// Counter to decrement cards countdown
 var counter=function() {
 	cards.forEach(function(item, index, array) {
 		if(item.countdown>0) {
@@ -139,26 +148,32 @@ var counter=function() {
 	});
 }
 
-var update=function(modifier) {
+// call counter each 16ms (~60 per second)
+setInterval(counter, 16);
 
+// refresh clicks number on page
+var updateClicks=function() {
 	var cl=document.getElementById("clicks");
 	cl.removeChild(cl.firstChild);
 	cl.appendChild(document.createTextNode("Clicks: "+clicks));
 }
 
+// drawing cards on canvas
 var render=function() {
 	if(sprReady) {
 		var offsetX=0;
 		var offsetY=0;
-		// 
 		for(var i=0; i<3*level; i++) {
 			for(var j=0; j<6; j++) {
 				var index=i*6+j;
+				// card face up
 				if(cards[index].show || cards[index].countdown>0) {
+					// cardX and cardY are coordinates on the sprite
 					var cardY=cards[index].id%9;
 					var cardX=Math.floor(cards[index].id/9);
 					ctx.drawImage(spr, 64+64*cardX, 64*cardY, 64, 64, offsetX, offsetY, 64, 64);
 				}
+				// card face down
 				else ctx.drawImage(spr, cardFaceDown.x, cardFaceDown.y, 64, 64, offsetX, offsetY, 64, 64);
 			
 				offsetX+=64;
@@ -169,13 +184,8 @@ var render=function() {
 	}
 }
 
-// call counter each ms
-setInterval(counter, 16);
-
 // The main game loop
 var main = function () {
-	// run the update function
-	update(0.02); // do not change
 	// run the render function
 	render();
 	// Request to do this again ASAP
@@ -186,5 +196,4 @@ var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
 init(level);
-reset();
 main();
