@@ -14,7 +14,7 @@ Memoryjs is a tribute to my first graphical game made originally in C. It is bas
 	- [X] generate random pairs in custom structure
 	- [X] draw cards on screen
 	- [X] clicks count
-	- [ ] timer
+	- [X] timer
 	
 # Credits
 - thanks to [scale2x](https://www.scale2x.it/) for letting me update my old 32x32 sprites

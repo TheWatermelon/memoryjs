@@ -17,6 +17,7 @@ var hasCountdown=false;
 // misc
 var level=1;
 var clicks=0;
+var seconds=0;
 
 // Fisher-Yates Shuffle
 var shuffle=function(array) {
@@ -42,6 +43,7 @@ var shuffle=function(array) {
 var init=function(lvl) {
 	level=lvl;
 	clicks=0;
+	seconds=0;
 
 	// fixed canvas size based on number of cards
 	c.width=6*64;
@@ -85,12 +87,16 @@ var init=function(lvl) {
 		p.appendChild(document.createTextNode(' '));
 	}
 
-	// show clicks number on page
+	// show clicks number and timer on page
+	var min=Math.floor(seconds/60);
+	var formatMin=(min<10)?"0"+min:min;
+	var sec=seconds%60;
+	var formatSec=(sec<10)?"0"+sec:sec;
 	if(document.getElementById('clicks')!==null) document.getElementById('clicks').remove();
 	var cl = document.createElement("p");
 	cl.setAttribute("id", "clicks");
 	document.body.appendChild(cl);
-	cl.appendChild(document.createTextNode("Clicks: "+clicks));
+	cl.appendChild(document.createTextNode("Clicks: "+clicks+" Time "+formatMin+":"+formatSec));
 }
 
 // match cards based on id
@@ -151,11 +157,22 @@ var counter=function() {
 // call counter each 16ms (~60 per second)
 setInterval(counter, 16);
 
+// timer called each second
+var timer=function() {
+	if(!checkWin()) seconds++;
+	updateClicks();
+}
+setInterval(timer, 1000);
+
 // refresh clicks number on page
 var updateClicks=function() {
 	var cl=document.getElementById("clicks");
 	cl.removeChild(cl.firstChild);
-	cl.appendChild(document.createTextNode("Clicks: "+clicks));
+	var min=Math.floor(seconds/60);
+	var formatMin=(min<10)?"0"+min:min;
+	var sec=seconds%60;
+	var formatSec=(sec<10)?"0"+sec:sec;
+	cl.appendChild(document.createTextNode("Clicks: "+clicks+" Time "+formatMin+":"+formatSec));
 }
 
 // drawing cards on canvas
